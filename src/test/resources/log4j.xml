@@ -12,7 +12,7 @@
   </appender>
   
   <logger name="org.springframework">
-    <level value="info" />
+    <level value="error" />
   </logger>
   <logger name="org.apache.http">
     <level value="info" />
