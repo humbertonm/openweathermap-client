@@ -93,7 +93,7 @@ public class OpenWeatherMapUrlBuilder {
     if(unitFormat != null && unitFormat.getFormat() != null){
       addParam(fullUrl,UNITS_PARAM,unitFormat.getFormat(), false);
     }
-    if(language != null){
+    if(language != null && language.getLang() != null){
       addParam(fullUrl,LANGUAGE_PARAM,language.getLang(), false);
     }
   }

@@ -5,6 +5,7 @@ package org.openweathermap.client.params;
  */
 public enum Language {
 
+  DEFAULT(null),
   ENGLISH("en"),
   RUSSIAN("ru"),
   ITALIAN("it"),
