@@ -13,7 +13,7 @@ public interface OpenWeatherMapClient {
 
   OpenWeatherMapClientResponse getCurrentWeatherByCityName(String cityName, String countryCode, OtherFeatures features);
   OpenWeatherMapClientResponse getCurrentWeatherById(Long id, OtherFeatures features);
-  //OpenWeatherMapClientResponse getCurrentWeatherByGeographicCoordinates(Double lat, Double lon, OtherFeatures features);
-  //OpenWeatherMapClientResponse getCurrentWeatherByZipCode(String zipCode, Locale locale, OtherFeatures features);
+  OpenWeatherMapClientResponse getCurrentWeatherByGeographicCoordinates(Double lat, Double lon, OtherFeatures features);
+  OpenWeatherMapClientResponse getCurrentWeatherByZipCode(String zipCode, String countryCode, OtherFeatures features);
   //OpenWeatherMapListResponse getCurrentWeatherFromCitiesWithinRectangleZone(String bbox, String cluster, OtherFeatures features);
 }

@@ -26,6 +26,9 @@ public class OpenWeatherMapUrlBuilder {
   private static final String LANGUAGE_PARAM = "lang";
   private static final String FORMAT_PARAM = "xml";
   private static final String ID_PARAM = "id";
+  private static final String LAT_PARAM = "lat";
+  private static final String LON_PARAM = "lon";
+  private static final String ZIPCODE_PARAM = "zip";
 
 
   private OpenWeatherMapUrlBuilder(){
@@ -46,11 +49,33 @@ public class OpenWeatherMapUrlBuilder {
     return fullUrl.toString();
   }
 
-  public static String buildCurrentWeatherById(String url, Long id, String appId, OtherFeatures features){
+  public static String buildCurrentWeatherByIdUrl(String url, Long id, String appId, OtherFeatures features){
     StringBuilder fullUrl = new StringBuilder(url);
     fullUrl.append("weather");
     addParam(fullUrl, ID_PARAM, id.toString(), true);
-    addOtherFeatures(fullUrl,features);
+    addOtherFeatures(fullUrl, features);
+    addParam(fullUrl, APP_ID_PARAM, appId, false);
+    return fullUrl.toString();
+  }
+
+  public static String buildCurrentWeatherByGeoCoordsUrl(String url, Double lat, Double lon, String appId, OtherFeatures features){
+    StringBuilder fullUrl = new StringBuilder(url);
+    fullUrl.append("weather");
+    addParam(fullUrl, LAT_PARAM, lat.toString(), true);
+    addParam(fullUrl, LON_PARAM, lon.toString(), false);
+    addOtherFeatures(fullUrl, features);
+    addParam(fullUrl, APP_ID_PARAM, appId, false);
+    return fullUrl.toString();
+  }
+
+  public static String buildCurrentWeatherByZipCodeUrl(String url, String zipCode, String countryCode, String appId, OtherFeatures features){
+    StringBuilder fullUrl = new StringBuilder(url);
+    fullUrl.append("weather");
+    addParam(fullUrl, ZIPCODE_PARAM, zipCode, true);
+    fullUrl.append(",");
+    fullUrl.append(countryCode);
+    addOtherFeatures(fullUrl, features);
+    addParam(fullUrl, APP_ID_PARAM, appId, false);
     return fullUrl.toString();
   }
 

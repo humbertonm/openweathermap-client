@@ -23,7 +23,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
         "sys",
         "id",
         "name",
-        "cod"
+        "cod",
+        "message"
         })
 public class OpenWeatherMapClientResponse {
 
@@ -51,6 +52,8 @@ public class OpenWeatherMapClientResponse {
   private String name;
   @JsonProperty("cod")
   private String cod;
+  @JsonProperty("message")
+  private String message;
 
   /**
    * No args constructor for use in serialization
@@ -327,6 +330,14 @@ public class OpenWeatherMapClientResponse {
   @JsonProperty("cod")
   public void setCod(String cod) {
     this.cod = cod;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 
   @Override

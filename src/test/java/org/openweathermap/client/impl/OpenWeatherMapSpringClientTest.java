@@ -1,5 +1,6 @@
 package org.openweathermap.client.impl;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openweathermap.client.OpenWeatherMapClient;
@@ -35,23 +36,56 @@ public class OpenWeatherMapSpringClientTest {
   @Test
   public void verifyResponseFromExistingCityAndLocale(){
     OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName("Mexico City", "mx", features);
+    OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName("Mexico City", "XX", features);
     LOG.debug("Response: {}", response);
   }
 
   @Test
   public void verifyResponseNoExistingCity(){
     OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName("Invalid", null, features);
+    OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName("Invalid ", null, features);
     LOG.debug("Response: {}", response);
   }
 
   @Test
-  public void x(){
-    Locale l = new Locale("es","mx");
-    LOG.debug("country: {}", l.getCountry());
-
+  public void verifySearchByIdResponse(){
+    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
+    OpenWeatherMapClientResponse response = client.getCurrentWeatherById(2172797L, features);
+    LOG.debug("Response: {}", response);
   }
+
+  @Test
+  public void verifySearchByGeoCoordsResponse(){
+    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
+    OpenWeatherMapClientResponse response = client.getCurrentWeatherByGeographicCoordinates(-16.92, 145.77, features);
+    LOG.debug("Response: {}", response);
+  }
+
+  @Test
+  public void validateBadResponseWhenInvalidGeoCoordsRequest(){
+    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
+    OpenWeatherMapClientResponse response = client.getCurrentWeatherByGeographicCoordinates(-1000.0,360.0, features);
+    LOG.debug("Response: {}", response);
+    Assert.assertEquals("404", response.getCod());
+    Assert.assertEquals("Error: Not found city", response.getMessage());
+  }
+
+  @Test
+  public void verifySearchByZipCodeResponse(){
+    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
+    OpenWeatherMapClientResponse response = client.getCurrentWeatherByZipCode("94040", "us", features);
+    LOG.debug("Response: {}", response);
+  }
+
+  @Test
+  public void validateBadResponseWhenInvalidZipCodeRequest(){
+    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
+    OpenWeatherMapClientResponse response = client.getCurrentWeatherByZipCode("00000", "XX", features);
+    LOG.debug("Response: {}", response);
+    Assert.assertEquals("404", response.getCod());
+    Assert.assertEquals("Error: Not found city", response.getMessage());
+  }
+
 
 
 }
