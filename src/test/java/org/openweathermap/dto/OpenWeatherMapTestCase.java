@@ -1,5 +1,6 @@
 package org.openweathermap.dto;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.openweathermap.client.params.OtherFeatures;
 import org.openweathermap.client.response.OpenWeatherMapClientResponse;
 
@@ -115,18 +116,6 @@ public class OpenWeatherMapTestCase {
 
   @Override
   public String toString() {
-    return "OpenWeatherMapTestCase{" +
-        "testCaseId=" + testCaseId +
-        ", description='" + description + '\'' +
-        ", type=" + type +
-        ", cityName='" + cityName + '\'' +
-        ", countryCode='" + countryCode + '\'' +
-        ", cityId=" + cityId +
-        ", lat=" + lat +
-        ", lon=" + lon +
-        ", zipCode='" + zipCode + '\'' +
-        ", features=" + features +
-        ", expectedResult=" + expectedResult +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }

@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by betob_000 on 29/11/2015.
+ * Created by beto on 29/11/2015.
  */
 @Component
 public class ExcelTestCaseDao implements TestCaseDao {
@@ -31,6 +31,7 @@ public class ExcelTestCaseDao implements TestCaseDao {
   private static final Logger LOG = LoggerFactory.getLogger(ExcelTestCaseDao.class);
 
   private static final int HEADER_ROWS = 1;
+  public static final int FEATURES_SIZE = 4;
 
   @Value("${testcases.filename}")
   private String testCasesFileName;
@@ -38,6 +39,10 @@ public class ExcelTestCaseDao implements TestCaseDao {
   private String testCasesByCityNameSheet;
   @Value("${testcases.byid.sheet}")
   private String testCasesByIdSheet;
+  @Value("${testcases.bygeocoords.sheet}")
+  private String testCasesByGeoCoordsSheet;
+  @Value("${testcases.byzipcode.sheet}")
+  private String testCasesByZipCodeSheet;
 
   public List<OpenWeatherMapTestCase> getTestCasesByCityName() throws IOException {
     List<OpenWeatherMapTestCase> testCases = new ArrayList<OpenWeatherMapTestCase>();
@@ -61,7 +66,7 @@ public class ExcelTestCaseDao implements TestCaseDao {
     while (rowIterator.hasNext()) {
       Row row = rowIterator.next();
       int rowNum = row.getRowNum();
-      if(rowNum < HEADER_ROWS) {  // saltar encabezados
+      if(rowNum < HEADER_ROWS) {  // skip headers
         continue;
       }
 
@@ -75,22 +80,11 @@ public class ExcelTestCaseDao implements TestCaseDao {
       testCase.setCityName(getStringValue(row.getCell(i++), evaluator));
       testCase.setCountryCode(getStringValue(row.getCell(i++), evaluator));
 
-      OtherFeatures features = new OtherFeatures();
-      features.setFormat(Format.valueOf(getStringValue(row.getCell(i++), evaluator)));
-      features.setSearchAccuracy(SearchAccuracy.valueOf(getStringValue(row.getCell(i++), evaluator)));
-      features.setUnitFormat(UnitFormat.valueOf(getStringValue(row.getCell(i++), evaluator)));
-      features.setLanguage(Language.valueOf(getStringValue(row.getCell(i++), evaluator)));
+      testCase.setFeatures(buildFeatures(row, i, evaluator));
+      //Move index
+      i+= FEATURES_SIZE;
 
-      testCase.setFeatures(features);
-
-      OpenWeatherMapClientResponse expectedResult = new OpenWeatherMapClientResponse();
-      expectedResult.setCod(getStringValue(row.getCell(i++), evaluator));
-      expectedResult.setMessage(getStringValue(row.getCell(i++), evaluator));
-      expectedResult.setId(getStringValue(row.getCell(i++), evaluator));
-      expectedResult.setName(getStringValue(row.getCell(i++), evaluator));
-
-      testCase.setExpectedResult(expectedResult);
-
+      testCase.setExpectedResult(buildExpectedResult(row, i, evaluator));
 
       testCases.add(testCase);
     }
@@ -122,7 +116,7 @@ public class ExcelTestCaseDao implements TestCaseDao {
     while (rowIterator.hasNext()) {
       Row row = rowIterator.next();
       int rowNum = row.getRowNum();
-      if(rowNum < HEADER_ROWS) {  // saltar encabezados
+      if(rowNum < HEADER_ROWS) {  // skip headers
         continue;
       }
 
@@ -135,22 +129,11 @@ public class ExcelTestCaseDao implements TestCaseDao {
 
       testCase.setCityId(getLongValue(row.getCell(i++), evaluator));
 
-      OtherFeatures features = new OtherFeatures();
-      features.setFormat(Format.valueOf(getStringValue(row.getCell(i++), evaluator)));
-      features.setSearchAccuracy(SearchAccuracy.valueOf(getStringValue(row.getCell(i++), evaluator)));
-      features.setUnitFormat(UnitFormat.valueOf(getStringValue(row.getCell(i++), evaluator)));
-      features.setLanguage(Language.valueOf(getStringValue(row.getCell(i++), evaluator)));
+      testCase.setFeatures(buildFeatures(row, i, evaluator));
+      //Move index
+      i+= FEATURES_SIZE;
 
-      testCase.setFeatures(features);
-
-      OpenWeatherMapClientResponse expectedResult = new OpenWeatherMapClientResponse();
-      expectedResult.setCod(getStringValue(row.getCell(i++), evaluator));
-      expectedResult.setMessage(getStringValue(row.getCell(i++), evaluator));
-      expectedResult.setId(getStringValue(row.getCell(i++), evaluator));
-      expectedResult.setName(getStringValue(row.getCell(i++), evaluator));
-
-      testCase.setExpectedResult(expectedResult);
-
+      testCase.setExpectedResult(buildExpectedResult(row, i, evaluator));
 
       testCases.add(testCase);
     }
@@ -160,12 +143,104 @@ public class ExcelTestCaseDao implements TestCaseDao {
     return testCases;
   }
 
-  public List<OpenWeatherMapTestCase> getTestCasesByGeoCoords() {
-    return null;
+  public List<OpenWeatherMapTestCase> getTestCasesByGeoCoords() throws IOException {
+    List<OpenWeatherMapTestCase> testCases = new ArrayList<OpenWeatherMapTestCase>();
+    File f = new File(testCasesFileName);
+    LOG.debug("Reading file: {}" , f.getAbsoluteFile());
+
+    FileInputStream file = new FileInputStream(f);
+    XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+    XSSFSheet sheet = workbook.getSheet(testCasesByGeoCoordsSheet);
+
+    if (sheet == null) {
+      return testCases;
+    }
+
+    FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+    LOG.debug("Row Count {}: ", (sheet.getLastRowNum() + 1));
+
+    Iterator<Row> rowIterator = sheet.iterator();
+    while (rowIterator.hasNext()) {
+      Row row = rowIterator.next();
+      int rowNum = row.getRowNum();
+      if(rowNum < HEADER_ROWS) {  // skip headers
+        continue;
+      }
+
+      OpenWeatherMapTestCase testCase = new OpenWeatherMapTestCase();
+
+      int i = 0;
+      testCase.setTestCaseId(getLongValue(row.getCell(i++), evaluator));
+      testCase.setDescription(getStringValue(row.getCell(i++), evaluator));
+      testCase.setType(TestCaseType.valueOf(getStringValue(row.getCell(i++), evaluator)));
+
+      testCase.setLat(getDoubleValue(row.getCell(i++), evaluator));
+      testCase.setLon(getDoubleValue(row.getCell(i++), evaluator));
+
+      testCase.setFeatures(buildFeatures(row, i, evaluator));
+      //Move index
+      i+= FEATURES_SIZE;
+
+      testCase.setExpectedResult(buildExpectedResult(row, i, evaluator));
+
+      testCases.add(testCase);
+    }
+
+    file.close();
+
+    return testCases;
   }
 
-  public List<OpenWeatherMapTestCase> getTestCasesByZipCode() {
-    return null;
+  public List<OpenWeatherMapTestCase> getTestCasesByZipCode() throws IOException {
+    List<OpenWeatherMapTestCase> testCases = new ArrayList<OpenWeatherMapTestCase>();
+    File f = new File(testCasesFileName);
+    LOG.debug("Reading file: {}" , f.getAbsoluteFile());
+
+    FileInputStream file = new FileInputStream(f);
+    XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+    XSSFSheet sheet = workbook.getSheet(testCasesByZipCodeSheet);
+
+    if (sheet == null) {
+      return testCases;
+    }
+
+    FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+    LOG.debug("Row Count {}: ", (sheet.getLastRowNum() + 1));
+
+    Iterator<Row> rowIterator = sheet.iterator();
+    while (rowIterator.hasNext()) {
+      Row row = rowIterator.next();
+      int rowNum = row.getRowNum();
+      if(rowNum < HEADER_ROWS) {  // skip headers
+        continue;
+      }
+
+      OpenWeatherMapTestCase testCase = new OpenWeatherMapTestCase();
+
+      int i = 0;
+      testCase.setTestCaseId(getLongValue(row.getCell(i++), evaluator));
+      testCase.setDescription(getStringValue(row.getCell(i++), evaluator));
+      testCase.setType(TestCaseType.valueOf(getStringValue(row.getCell(i++), evaluator)));
+
+      testCase.setZipCode(getStringValue(row.getCell(i++), evaluator));
+      testCase.setCountryCode(getStringValue(row.getCell(i++), evaluator));
+
+      testCase.setFeatures(buildFeatures(row, i, evaluator));
+      //Move index
+      i+= FEATURES_SIZE;
+
+      testCase.setExpectedResult(buildExpectedResult(row, i, evaluator));
+
+      testCases.add(testCase);
+    }
+
+    file.close();
+
+    return testCases;
   }
 
   private String getStringValue(Cell cell, FormulaEvaluator evaluator) {
@@ -238,5 +313,23 @@ public class ExcelTestCaseDao implements TestCaseDao {
     }
 
     return value;
+  }
+
+  private OtherFeatures buildFeatures(Row row, int i, FormulaEvaluator evaluator){
+    OtherFeatures features = new OtherFeatures();
+    features.setFormat(Format.valueOf(getStringValue(row.getCell(i++), evaluator)));
+    features.setSearchAccuracy(SearchAccuracy.valueOf(getStringValue(row.getCell(i++), evaluator)));
+    features.setUnitFormat(UnitFormat.valueOf(getStringValue(row.getCell(i++), evaluator)));
+    features.setLanguage(Language.valueOf(getStringValue(row.getCell(i++), evaluator)));
+    return features;
+  }
+
+  private OpenWeatherMapClientResponse buildExpectedResult(Row row, int i, FormulaEvaluator evaluator){
+    OpenWeatherMapClientResponse expectedResult = new OpenWeatherMapClientResponse();
+    expectedResult.setCod(getStringValue(row.getCell(i++), evaluator));
+    expectedResult.setMessage(getStringValue(row.getCell(i++), evaluator));
+    expectedResult.setId(getStringValue(row.getCell(i++), evaluator));
+    expectedResult.setName(getStringValue(row.getCell(i++), evaluator));
+    return expectedResult;
   }
 }

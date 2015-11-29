@@ -48,27 +48,6 @@ public class OpenWeatherMapSpringClientTest {
   private OpenWeatherMapTestCase testCase;
 
   @Test
-  public void verifyResponseFromExistingCity(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName("Mexico", "", features);
-    LOG.debug("Response: {}", response);
-  }
-
-  @Test
-  public void verifyResponseFromExistingCityAndLocale(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName("Mexico City", "XX", features);
-    LOG.debug("Response: {}", response);
-  }
-
-  @Test
-  public void verifyResponseNoExistingCity(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName("Invalid ", null, features);
-    LOG.debug("Response: {}", response);
-  }
-
-  @Test
   public void validateSearchByNameResponseFromDao() throws IOException {
     List<OpenWeatherMapTestCase> testCases = testCaseDao.getTestCasesByCityName();
     for(OpenWeatherMapTestCase testCase : testCases){
@@ -79,13 +58,6 @@ public class OpenWeatherMapSpringClientTest {
       LOG.debug("Response: {}", response);
       compareResponse(expected,response);
     }
-  }
-
-  @Test
-  public void verifySearchByIdResponse(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherById(2172797L, features);
-    LOG.debug("Response: {}", response);
   }
 
   @Test
@@ -111,35 +83,47 @@ public class OpenWeatherMapSpringClientTest {
   }
 
   @Test
-  public void verifySearchByGeoCoordsResponse(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByGeographicCoordinates(-16.92, 145.77, features);
-    LOG.debug("Response: {}", response);
+  public void validateSearchByGeoCoordsResponseFromDao() throws IOException {
+    List<OpenWeatherMapTestCase> testCases = testCaseDao.getTestCasesByGeoCoords();
+    for(OpenWeatherMapTestCase testCase : testCases){
+      this.testCase = testCase;
+      OtherFeatures features = testCase.getFeatures();
+      OpenWeatherMapClientResponse response = client.getCurrentWeatherByGeographicCoordinates(testCase.getLat(), testCase.getLon(), features);
+      OpenWeatherMapClientResponse expected = testCase.getExpectedResult();
+      LOG.debug("Response: {}", response);
+      switch (testCase.getType()){
+        case CORRECT:
+          compareResponse(expected, response);
+          break;
+        case INVALID_DATA:
+          compareResponseInvalidData(expected,response);
+          break;
+        default:
+          LOG.error("Not Implemented");
+      }
+    }
   }
 
   @Test
-  public void validateBadResponseWhenInvalidGeoCoordsRequest(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByGeographicCoordinates(-1000.0,360.0, features);
-    LOG.debug("Response: {}", response);
-    Assert.assertEquals("404", response.getCod());
-    Assert.assertEquals("Error: Not found city", response.getMessage());
-  }
-
-  @Test
-  public void verifySearchByZipCodeResponse(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByZipCode("94040", "us", features);
-    LOG.debug("Response: {}", response);
-  }
-
-  @Test
-  public void validateBadResponseWhenInvalidZipCodeRequest(){
-    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.ENGLISH);
-    OpenWeatherMapClientResponse response = client.getCurrentWeatherByZipCode("00000", "XX", features);
-    LOG.debug("Response: {}", response);
-    Assert.assertEquals("404", response.getCod());
-    Assert.assertEquals("Error: Not found city", response.getMessage());
+  public void validateSearchByZipCodeResponseFromDao() throws IOException {
+    List<OpenWeatherMapTestCase> testCases = testCaseDao.getTestCasesByZipCode();
+    for(OpenWeatherMapTestCase testCase : testCases){
+      this.testCase = testCase;
+      OtherFeatures features = testCase.getFeatures();
+      OpenWeatherMapClientResponse response = client.getCurrentWeatherByZipCode(testCase.getZipCode(), testCase.getCountryCode(), features);
+      OpenWeatherMapClientResponse expected = testCase.getExpectedResult();
+      LOG.debug("Response: {}", response);
+      switch (testCase.getType()){
+        case CORRECT:
+          compareResponse(expected, response);
+          break;
+        case INVALID_DATA:
+          compareResponseInvalidData(expected,response);
+          break;
+        default:
+          LOG.error("Not Implemented");
+      }
+    }
   }
 
   private void compareResponse(OpenWeatherMapClientResponse expected, OpenWeatherMapClientResponse response){

@@ -13,7 +13,7 @@ public interface TestCaseDao {
 
   List<OpenWeatherMapTestCase> getTestCasesByCityName() throws IOException;
   List<OpenWeatherMapTestCase> getTestCasesById() throws IOException;
-  List<OpenWeatherMapTestCase> getTestCasesByGeoCoords();
-  List<OpenWeatherMapTestCase> getTestCasesByZipCode();
+  List<OpenWeatherMapTestCase> getTestCasesByGeoCoords() throws IOException;
+  List<OpenWeatherMapTestCase> getTestCasesByZipCode() throws IOException;
 
 }
