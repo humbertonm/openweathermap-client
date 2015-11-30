@@ -10,6 +10,7 @@ import org.openweathermap.client.params.*;
 import org.openweathermap.client.response.OpenWeatherMapClientResponse;
 import org.openweathermap.dto.OpenWeatherMapTestCase;
 import org.openweathermap.dto.TestCaseType;
+import org.openweathermap.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,13 +46,20 @@ public class ExcelTestCaseDao implements TestCaseDao {
   @Value("${testcases.byzipcode.sheet}")
   private String testCasesByZipCodeSheet;
 
-  public List<OpenWeatherMapTestCase> getTestCasesByCityName() throws IOException {
+  public List<OpenWeatherMapTestCase> getTestCasesByCityName() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = new ArrayList<OpenWeatherMapTestCase>();
     File f = new File(testCasesFileName);
     LOG.debug("Reading file: {}" , f.getAbsoluteFile());
 
-    FileInputStream file = new FileInputStream(f);
-    XSSFWorkbook workbook = new XSSFWorkbook(file);
+    FileInputStream file = null;
+    XSSFWorkbook workbook = null;
+    try {
+      file = new FileInputStream(f);
+      workbook = new XSSFWorkbook(file);
+    } catch (IOException e) {
+      throw new DaoException("Reading excel file", e);
+    }
+
 
     XSSFSheet sheet = workbook.getSheet(testCasesByCityNameSheet);
 
@@ -89,18 +98,28 @@ public class ExcelTestCaseDao implements TestCaseDao {
       testCases.add(testCase);
     }
 
-    file.close();
+    try {
+      file.close();
+    } catch (IOException e) {
+      throw new DaoException("Closing file: " + testCasesFileName,e);
+    }
 
     return testCases;
   }
 
-  public List<OpenWeatherMapTestCase> getTestCasesById() throws IOException {
+  public List<OpenWeatherMapTestCase> getTestCasesById() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = new ArrayList<OpenWeatherMapTestCase>();
     File f = new File(testCasesFileName);
     LOG.debug("Reading file: {}" , f.getAbsoluteFile());
 
-    FileInputStream file = new FileInputStream(f);
-    XSSFWorkbook workbook = new XSSFWorkbook(file);
+    FileInputStream file = null;
+    XSSFWorkbook workbook = null;
+    try {
+      file = new FileInputStream(f);
+      workbook = new XSSFWorkbook(file);
+    } catch (IOException e) {
+      throw new DaoException("Reading excel file", e);
+    }
 
     XSSFSheet sheet = workbook.getSheet(testCasesByIdSheet);
 
@@ -138,19 +157,28 @@ public class ExcelTestCaseDao implements TestCaseDao {
       testCases.add(testCase);
     }
 
-    file.close();
+    try {
+      file.close();
+    } catch (IOException e) {
+      throw new DaoException("Closing file: " + testCasesFileName,e);
+    }
 
     return testCases;
   }
 
-  public List<OpenWeatherMapTestCase> getTestCasesByGeoCoords() throws IOException {
+  public List<OpenWeatherMapTestCase> getTestCasesByGeoCoords() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = new ArrayList<OpenWeatherMapTestCase>();
     File f = new File(testCasesFileName);
     LOG.debug("Reading file: {}" , f.getAbsoluteFile());
 
-    FileInputStream file = new FileInputStream(f);
-    XSSFWorkbook workbook = new XSSFWorkbook(file);
-
+    FileInputStream file = null;
+    XSSFWorkbook workbook = null;
+    try {
+      file = new FileInputStream(f);
+      workbook = new XSSFWorkbook(file);
+    } catch (IOException e) {
+      throw new DaoException("Reading excel file", e);
+    }
     XSSFSheet sheet = workbook.getSheet(testCasesByGeoCoordsSheet);
 
     if (sheet == null) {
@@ -188,18 +216,28 @@ public class ExcelTestCaseDao implements TestCaseDao {
       testCases.add(testCase);
     }
 
-    file.close();
+    try {
+      file.close();
+    } catch (IOException e) {
+      throw new DaoException("Closing file: " + testCasesFileName,e);
+    }
 
     return testCases;
   }
 
-  public List<OpenWeatherMapTestCase> getTestCasesByZipCode() throws IOException {
+  public List<OpenWeatherMapTestCase> getTestCasesByZipCode() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = new ArrayList<OpenWeatherMapTestCase>();
     File f = new File(testCasesFileName);
     LOG.debug("Reading file: {}" , f.getAbsoluteFile());
 
-    FileInputStream file = new FileInputStream(f);
-    XSSFWorkbook workbook = new XSSFWorkbook(file);
+    FileInputStream file = null;
+    XSSFWorkbook workbook = null;
+    try {
+      file = new FileInputStream(f);
+      workbook = new XSSFWorkbook(file);
+    } catch (IOException e) {
+      throw new DaoException("Reading excel file", e);
+    }
 
     XSSFSheet sheet = workbook.getSheet(testCasesByZipCodeSheet);
 
@@ -238,7 +276,11 @@ public class ExcelTestCaseDao implements TestCaseDao {
       testCases.add(testCase);
     }
 
-    file.close();
+    try {
+      file.close();
+    } catch (IOException e) {
+      throw new DaoException("Closing file: " + testCasesFileName,e);
+    }
 
     return testCases;
   }

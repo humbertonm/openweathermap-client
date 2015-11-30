@@ -1,6 +1,7 @@
 package org.openweathermap.dao;
 
 import org.openweathermap.dto.OpenWeatherMapTestCase;
+import org.openweathermap.exceptions.DaoException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,9 +12,9 @@ import java.util.List;
  */
 public interface TestCaseDao {
 
-  List<OpenWeatherMapTestCase> getTestCasesByCityName() throws IOException;
-  List<OpenWeatherMapTestCase> getTestCasesById() throws IOException;
-  List<OpenWeatherMapTestCase> getTestCasesByGeoCoords() throws IOException;
-  List<OpenWeatherMapTestCase> getTestCasesByZipCode() throws IOException;
+  List<OpenWeatherMapTestCase> getTestCasesByCityName() throws DaoException;
+  List<OpenWeatherMapTestCase> getTestCasesById() throws DaoException;
+  List<OpenWeatherMapTestCase> getTestCasesByGeoCoords() throws DaoException;
+  List<OpenWeatherMapTestCase> getTestCasesByZipCode() throws DaoException;
 
 }

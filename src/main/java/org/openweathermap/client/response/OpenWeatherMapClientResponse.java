@@ -15,6 +15,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
         "weather",
         "base",
         "main",
+        "visibility",
         "wind",
         "clouds",
         "rain",
@@ -36,6 +37,8 @@ public class OpenWeatherMapClientResponse {
   private String base;
   @JsonProperty("main")
   private Main main;
+  @JsonProperty("visibility")
+  private Integer visibility;
   @JsonProperty("wind")
   private Wind wind;
   @JsonProperty("clouds")
@@ -338,6 +341,14 @@ public class OpenWeatherMapClientResponse {
 
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  public Integer getVisibility() {
+    return visibility;
+  }
+
+  public void setVisibility(Integer visibility) {
+    this.visibility = visibility;
   }
 
   @Override

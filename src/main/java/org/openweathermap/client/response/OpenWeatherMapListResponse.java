@@ -3,6 +3,7 @@ package org.openweathermap.client.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
@@ -67,5 +68,10 @@ public class OpenWeatherMapListResponse {
 
   public void setList(List<OpenWeatherMapClientResponse> list) {
     this.list = list;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
   }
 }

@@ -10,8 +10,10 @@ import org.junit.runner.RunWith;
 import org.openweathermap.client.OpenWeatherMapClient;
 import org.openweathermap.client.params.*;
 import org.openweathermap.client.response.OpenWeatherMapClientResponse;
+import org.openweathermap.client.response.OpenWeatherMapListResponse;
 import org.openweathermap.dao.TestCaseDao;
 import org.openweathermap.dto.OpenWeatherMapTestCase;
+import org.openweathermap.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ public class OpenWeatherMapSpringClientTest {
   public TestRule testWatcher = new TestWatcher() {
     @Override
     public void failed(Throwable t, Description test) {
-      LOG.debug("test case failed: {}", testCase);
+      LOG.error("test case failed: {}", testCase);
     }
   };
 
@@ -48,7 +50,7 @@ public class OpenWeatherMapSpringClientTest {
   private OpenWeatherMapTestCase testCase;
 
   @Test
-  public void validateSearchByNameResponseFromDao() throws IOException {
+  public void validateSearchByNameResponseFromDao() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = testCaseDao.getTestCasesByCityName();
     for(OpenWeatherMapTestCase testCase : testCases){
       this.testCase = testCase;
@@ -56,12 +58,12 @@ public class OpenWeatherMapSpringClientTest {
       OpenWeatherMapClientResponse response = client.getCurrentWeatherByCityName(testCase.getCityName(), testCase.getCountryCode(), features);
       OpenWeatherMapClientResponse expected = testCase.getExpectedResult();
       LOG.debug("Response: {}", response);
-      compareResponse(expected,response);
+      compareResponse(expected, response);
     }
   }
 
   @Test
-  public void validateSearchByIdResponseFromDao() throws IOException {
+  public void validateSearchByIdResponseFromDao() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = testCaseDao.getTestCasesById();
     for(OpenWeatherMapTestCase testCase : testCases){
       this.testCase = testCase;
@@ -83,7 +85,7 @@ public class OpenWeatherMapSpringClientTest {
   }
 
   @Test
-  public void validateSearchByGeoCoordsResponseFromDao() throws IOException {
+  public void validateSearchByGeoCoordsResponseFromDao() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = testCaseDao.getTestCasesByGeoCoords();
     for(OpenWeatherMapTestCase testCase : testCases){
       this.testCase = testCase;
@@ -105,7 +107,7 @@ public class OpenWeatherMapSpringClientTest {
   }
 
   @Test
-  public void validateSearchByZipCodeResponseFromDao() throws IOException {
+  public void validateSearchByZipCodeResponseFromDao() throws DaoException {
     List<OpenWeatherMapTestCase> testCases = testCaseDao.getTestCasesByZipCode();
     for(OpenWeatherMapTestCase testCase : testCases){
       this.testCase = testCase;
@@ -125,6 +127,16 @@ public class OpenWeatherMapSpringClientTest {
       }
     }
   }
+
+  @Test
+  public void validateSearchByBouncingBoxResponse(){
+    OtherFeatures features = new OtherFeatures(Format.JSON, SearchAccuracy.DEFAULT, UnitFormat.STANDARD, Language.DEFAULT);
+    BoundingBox bbox = new BoundingBox(12.0,32.0,15.0,17.0,10);
+    OpenWeatherMapListResponse response = client.getCurrentWeatherFromCitiesWithinRectangleZone(bbox, Cluster.YES, features);
+    LOG.debug("Response: {}", response);
+    Assert.assertEquals("200", response.getCod());
+  }
+
 
   private void compareResponse(OpenWeatherMapClientResponse expected, OpenWeatherMapClientResponse response){
     //Only Data that we know can be compared. Out of scope dinamic data

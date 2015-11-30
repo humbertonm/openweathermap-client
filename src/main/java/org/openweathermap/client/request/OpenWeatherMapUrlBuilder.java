@@ -29,6 +29,8 @@ public class OpenWeatherMapUrlBuilder {
   private static final String LAT_PARAM = "lat";
   private static final String LON_PARAM = "lon";
   private static final String ZIPCODE_PARAM = "zip";
+  private static final String BBOX_PARAM = "bbox";
+  private static final String CLUSTER_PARAM ="cluster";
 
 
   private OpenWeatherMapUrlBuilder(){
@@ -74,6 +76,27 @@ public class OpenWeatherMapUrlBuilder {
     addParam(fullUrl, ZIPCODE_PARAM, zipCode, true);
     fullUrl.append(",");
     fullUrl.append(countryCode);
+    addOtherFeatures(fullUrl, features);
+    addParam(fullUrl, APP_ID_PARAM, appId, false);
+    return fullUrl.toString();
+  }
+
+  public static String buildCurrentWeatherByBoundingBoxUrl(String url, BoundingBox box, Cluster cluster, String appId, OtherFeatures features){
+    StringBuilder fullUrl = new StringBuilder(url);
+    fullUrl.append("box/city");
+
+    addParam(fullUrl, BBOX_PARAM, box.getLatTopLeft().toString(), true);
+    fullUrl.append(",");
+    fullUrl.append(box.getLonTopLeft());
+    fullUrl.append(",");
+    fullUrl.append(box.getLatBottomRight());
+    fullUrl.append(",");
+    fullUrl.append(box.getLonBottomRight());
+    fullUrl.append(",");
+    fullUrl.append(box.getZoom());
+
+    addParam(fullUrl, CLUSTER_PARAM,cluster.getClusterOption(),false);
+
     addOtherFeatures(fullUrl, features);
     addParam(fullUrl, APP_ID_PARAM, appId, false);
     return fullUrl.toString();

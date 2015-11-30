@@ -4,6 +4,7 @@ import org.openweathermap.client.OpenWeatherMapClient;
 import org.openweathermap.client.params.*;
 import org.openweathermap.client.request.OpenWeatherMapUrlBuilder;
 import org.openweathermap.client.response.OpenWeatherMapClientResponse;
+import org.openweathermap.client.response.OpenWeatherMapListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,5 +50,12 @@ public class OpenWeatherMapSpringClient implements OpenWeatherMapClient{
     String fullUrl = OpenWeatherMapUrlBuilder.buildCurrentWeatherByZipCodeUrl(url, zipCode, countryCode, appId, features);
     LOG.debug("GET Request: {}", fullUrl);
     return restTemplate.getForObject(fullUrl, OpenWeatherMapClientResponse.class);
+  }
+
+  public OpenWeatherMapListResponse getCurrentWeatherFromCitiesWithinRectangleZone(BoundingBox bbox, Cluster cluster, OtherFeatures features) {
+    RestTemplate restTemplate = new RestTemplate();
+    String fullUrl = OpenWeatherMapUrlBuilder.buildCurrentWeatherByBoundingBoxUrl(url, bbox, cluster, appId, features);
+    LOG.debug("GET Request: {}", fullUrl);
+    return restTemplate.getForObject(fullUrl, OpenWeatherMapListResponse.class);
   }
 }

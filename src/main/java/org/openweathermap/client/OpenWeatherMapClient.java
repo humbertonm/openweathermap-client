@@ -15,5 +15,5 @@ public interface OpenWeatherMapClient {
   OpenWeatherMapClientResponse getCurrentWeatherById(Long id, OtherFeatures features);
   OpenWeatherMapClientResponse getCurrentWeatherByGeographicCoordinates(Double lat, Double lon, OtherFeatures features);
   OpenWeatherMapClientResponse getCurrentWeatherByZipCode(String zipCode, String countryCode, OtherFeatures features);
-  //OpenWeatherMapListResponse getCurrentWeatherFromCitiesWithinRectangleZone(String bbox, String cluster, OtherFeatures features);
+  OpenWeatherMapListResponse getCurrentWeatherFromCitiesWithinRectangleZone(BoundingBox bbox, Cluster cluster, OtherFeatures features);
 }
